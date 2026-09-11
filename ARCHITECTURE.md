@@ -71,6 +71,9 @@ packages/
         whoknows.ts         #   "who is the expert in Y" — evidence-cited people ranking
         ontology.ts         #   the ontology as an artifact: schema view (counts, orphans,
                             #   domain/range violations), RDF/OWL export, cited path finding
+        fde.ts              #   FDE.md, the deployment brief (spec https://fde.md): who we serve,
+                            #   mission, constraints, trusted data, people, decisions + the shared
+                            #   memory/work protocol the runner also hands to spawned agents
       pages/                # free-form markdown documents next to the ledger
         store.ts            #   create/list/read/write/delete; block-edited in the webui
       canvas/               # free-form spatial cards per engagement
@@ -84,7 +87,7 @@ packages/
     src/
       server.ts             #   node:http API + routes (launched by `openfde serve`);
                             #   /api/view mirrors CLI projections (interview, datamap,
-                            #   assets, flows, ontology); /api/page|canvas|task mirror the
+                            #   assets, flows, ontology, fde); /api/page|canvas|task mirror the
                             #   corresponding CLI verbs
       report-page.ts        #   printable executive report page
       index.html            #   zero-dependency workspace UI, four tabs:
@@ -102,8 +105,8 @@ apps/
     src/
       index.ts              #   thin assembler; registers commands
       commands/             #   one file per verb (engagement, ingest, extract,
-                            #   recall, remember, task, context, run, worktree, ontology,
-                            #   path, report, status, serve)
+                            #   recall, remember, fde, task, context, run, worktree,
+                            #   ontology, path, report, status, serve)
       lib/helpers.ts        #   fail / withLedger / actorName
 ```
 

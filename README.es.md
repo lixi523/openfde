@@ -76,6 +76,7 @@ pnpm openfde serve                 # espacio de trabajo en :4517, informe imprim
 | `openfde engagement create/list/use` | Gestiona engagements (un directorio local por proyecto de cliente) |
 | `openfde ingest <files…>` | Ingiere material como episodios, con procedencia obligatoria — texto, markdown, **PDF e imágenes** (extraídos nativamente vía Claude) |
 | `openfde extract` | Extracción restringida por ontología + resolución en dos fases (deduplicar / reemplazar) |
+| `openfde fde` | **FDE.md**, el brief de despliegue que todo agente lee primero: a quién servimos, misión, restricciones duras, datos de confianza, personas, decisiones y el protocolo de memoria/tareas — generado desde el ledger; `--write` conserva el bloque de notas del FDE ([spec](https://fde.md)) |
 | `openfde recall <query>` | Busca en la memoria; `--mode handoff` para la línea temporal; `--json` para agents |
 | `openfde remember <fact> --source <uri>` | Registra conocimiento descubierto en plena tarea (escritura de agents) |
 | `openfde whoknows <topic>` | Quién es el experto — personas rankeadas por propiedad, decisiones y menciones registradas, con evidencia citada |

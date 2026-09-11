@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   addCanvasCard,
   buildDataMap,
+  buildFdeDoc,
   buildFlows,
   buildInterviewGuide,
   buildOntologyView,
@@ -12,6 +13,7 @@ import {
   dataMapMarkdown,
   deletePage,
   entityNote,
+  fdeMarkdown,
   flowsMarkdown,
   interviewMarkdown,
   listAssets,
@@ -158,6 +160,9 @@ function viewMarkdown(slug: string, kind: string): string | null {
         const overview = buildOverviewFlow(db);
         return flowsMarkdown([...(overview ? [overview] : []), ...buildFlows(db)], slug);
       }
+      case "fde":
+        // the frontmatter is for files and agents; the note view shows the body
+        return fdeMarkdown(buildFdeDoc(db, slug)).replace(/^---\n[\s\S]*?\n---\n\n?/, "");
       case "ontology":
         return ontologyMarkdown(buildOntologyView(db), slug);
       case "assets":

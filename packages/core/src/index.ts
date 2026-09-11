@@ -123,6 +123,15 @@ export {
   type ExpertEvidence,
 } from "./projections/whoknows.js";
 export {
+  buildFdeDoc,
+  fdeMarkdown,
+  fdeProtocolMarkdown,
+  extractCustomBlock,
+  FDE_SPEC_VERSION,
+  FDE_SPEC_URL,
+  type FdeDoc,
+} from "./projections/fde.js";
+export {
   buildOntologyView,
   ontologyMarkdown,
   ontologyRdf,

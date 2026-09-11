@@ -76,6 +76,7 @@ pnpm openfde serve                 # ワークスペースは :4517、印刷可�
 | `openfde engagement create/list/use` | エンゲージメント管理（顧客プロジェクトごとに 1 ディレクトリ） |
 | `openfde ingest <files…>` | 資料をエピソードとして取り込み（出典必須）——テキスト、Markdown、**PDF・画像**（Claude ネイティブで抽出） |
 | `openfde extract` | オントロジー制約つき抽出 + 2 段階解決（重複排除 / 無効化置換） |
+| `openfde fde` | **FDE.md**——すべての agent が最初に読む配備ブリーフ：誰に仕えるか、ミッション、絶対に破れない制約、信頼できるデータ、人、決定、メモリ/タスクのプロトコル——ledger から生成；`--write` は FDE の手書きノートブロックを保持（[仕様](https://fde.md)） |
 | `openfde recall <query>` | メモリ検索；`--mode handoff` でタイムライン；`--json` は agent 向け |
 | `openfde remember <fact> --source <uri>` | タスク中に発見した知識を記録（agent の書き戻し） |
 | `openfde whoknows <topic>` | 誰が専門家か——記録された所有・決定・言及からランク付けし、引用付きの証拠を提示 |

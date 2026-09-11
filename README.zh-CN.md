@@ -76,6 +76,7 @@ pnpm openfde serve                 # 工作区 :4517，可打印报告在 /repor
 | `openfde engagement create/list/use` | 管理 engagement（一个客户项目一个本地目录） |
 | `openfde ingest <files…>` | 摄取材料为 episode，出处必填——文本、Markdown、**PDF 和图片**（经 Claude 原生抽取） |
 | `openfde extract` | 本体约束抽取 + 两阶段消解（去重 / 失效替代） |
+| `openfde fde` | **FDE.md**——每个 agent 首先要读的部署简报：服务谁、使命、硬约束、可信数据、人、决策，以及记忆/任务协议——从 ledger 生成；`--write` 保留 FDE 的手写笔记块（[规范](https://fde.md)） |
 | `openfde recall <query>` | 检索记忆；`--mode handoff` 看时间线；`--json` 给 agent |
 | `openfde remember <fact> --source <uri>` | 记录任务中发现的新知识（agent 回写） |
 | `openfde whoknows <topic>` | 谁是某主题的专家——按记录在案的归属、决策、提及排序，附引用证据 |

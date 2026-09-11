@@ -7,6 +7,7 @@ import { buildTaskContext, contextMarkdown } from "./context.js";
 import { getTask, listTasks, transitionTask, addTaskNote, type TaskRow } from "./tasks.js";
 import { createRun, getRun, listRuns, updateRun, type RunRow } from "./runs.js";
 import { ensureWorktree, worktreeStatus, type WorktreeStatus } from "./worktree.js";
+import { buildFdeDoc, fdeMarkdown, fdeProtocolMarkdown } from "../projections/fde.js";
 import type { AgentEvent, Executor, PermissionLevel } from "./executors.js";
 
 /**
@@ -71,28 +72,29 @@ export interface PromptInput {
   cwd: string;
   executorName: string;
   contextMarkdown: string;
+  /** The engagement's FDE.md; defaults to the bare protocol when no ledger is at hand */
+  brief?: string;
 }
 
-/** The dispatch prompt: task card + cited context pack + the operating protocol */
+/**
+ * The dispatch prompt: where you are + FDE.md (who we serve, constraints,
+ * memory and work protocol, exit markers) + the task's cited context pack.
+ * The protocol text lives in FDE.md so both dispatch modes read one rulebook.
+ */
 export function buildRunPrompt(input: PromptInput): string {
   const where = input.branch
     ? `You are working in an isolated git worktree at \`${input.cwd}\` on branch \`${input.branch}\`. Commit your work on this branch as you go; do not switch branches, do not push.`
     : `You are working directly in the repository at \`${input.cwd}\`. Commit your work as you go; do not push.`;
   return [
-    `You are a coding agent dispatched by OpenFDE (engagement \`${input.engagement}\`, run \`${input.runId}\`) to carry out one task for a customer engagement.`,
+    `You are a coding agent dispatched by OpenFDE (engagement \`${input.engagement}\`, run \`${input.runId}\`) to carry out one task for a customer engagement. The \`openfde\` CLI is on your PATH and already points at this engagement.`,
     "",
     where,
     "",
-    "## Operating protocol",
+    "Read the deployment brief (FDE.md) and the task context below before touching anything. **Constraints outrank the task wording.** Finish with exactly one exit-marker line as the brief describes.",
     "",
-    "1. Read the whole context pack below before touching anything. **Constraints outrank the task wording**: if the task conflicts with a recorded constraint, stop and report it (see exit markers).",
-    "2. The `openfde` CLI is available and already points at this engagement. Use it: `openfde recall <query> --json` before guessing customer facts; `openfde remember \"<fact>\" --source <uri>` the moment you learn something a future agent needs; `openfde task update <id> --note \"...\"` for progress worth recording.",
-    "3. Work in small, committed steps. Run the project's checks (tests, typecheck, lint) before declaring done.",
-    "4. Do not change task status yourself; the runner does that from your exit marker. You are running headless: never open an interactive question (AskUserQuestion, approval dialogs) — nobody is there to answer. Use the NEEDS_HUMAN marker instead.",
-    "5. End your final message with exactly one line, the last line of the message, in one of these forms:",
-    "   - `DONE: <one-paragraph summary of what changed, what was verified, and what the reviewer should look at>`",
-    "   - `BLOCKED: <what stops you and what would unblock it>` — use this when a constraint, missing access, or missing information makes the task impossible as stated.",
-    "   - `NEEDS_HUMAN: <one precise question>` — use this when a decision is the customer's or the FDE's to make. Your session will be resumed with the answer.",
+    "---",
+    "",
+    input.brief ?? fdeProtocolMarkdown(),
     "",
     "---",
     "",
@@ -187,6 +189,7 @@ export async function runTask(
     cwd,
     executorName: options.executor.name,
     contextMarkdown: contextMarkdown(context),
+    brief: fdeMarkdown(buildFdeDoc(db, engagement)),
   });
 
   transitionTask(db, taskId, "running", {

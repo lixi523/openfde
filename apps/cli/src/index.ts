@@ -23,6 +23,7 @@ import { registerWhoknows } from "./commands/whoknows.js";
 import { registerOntology } from "./commands/ontology.js";
 import { registerPath } from "./commands/path.js";
 import { registerRun } from "./commands/run.js";
+import { registerFde } from "./commands/fde.js";
 import { registerWorktree } from "./commands/worktree.js";
 
 const program = new Command();
@@ -37,6 +38,7 @@ registerEngagement(program);
 registerIngest(program);
 registerExtract(program);
 registerRecall(program);
+registerFde(program);
 registerRemember(program);
 registerWhoknows(program);
 registerPath(program);

@@ -1,175 +1,58 @@
 ---
 name: openfde
 description: >-
-  Operate the OpenFDE engagement memory from the command line. Use this skill
-  whenever you are working inside a customer engagement that has an openfde
-  ledger: to recall customer facts before answering ("what did the customer
-  say about X", "who owns Y"), to pick up and advance task cards, to pull the
-  context bundle before starting implementation work, to record discoveries
-  mid-task, or to judge finished work against its rubric. Trigger phrases:
-  "check the engagement memory", "claim a task", "what do we know about",
-  "record this finding", "run the eval".
+  Operate a customer engagement's shared memory and task ledger through the
+  `openfde` CLI. Use this skill whenever you work inside a repository or
+  engagement that has an FDE.md or an openfde ledger: before answering
+  questions about the customer ("what did they say about X", "who owns Y"),
+  before starting implementation work (claim the task, pull its context),
+  when you learn something worth remembering, or when you finish work.
+  Trigger phrases: "check the engagement memory", "claim a task", "what do we
+  know about", "record this finding", "read FDE.md".
 ---
 
-# openfde — engagement memory for agents
+# openfde — read FDE.md first
 
-OpenFDE is a local-first AI workspace for forward deployed engineers. Humans
-look at the web workspace (`openfde serve`); **you drive the same ledger
-through this CLI**. Every command supports `--json`; every fact carries a
-citation back to its source.
+This stub exists so you can find the real guide. The guide is **FDE.md**, the
+engagement's deployment brief: who we serve, the mission, the constraints you
+must never violate, which data to trust, who decides, and the exact protocol
+for using the shared memory and the task ledger. It is generated from the
+engagement ledger, so it can never drift from the data it describes.
+Spec: https://fde.md
 
-## Install (one-time)
+## Find the brief
+
+1. If the repository has an `FDE.md` at its root, read it — all of it.
+2. Otherwise, or if it looks stale, generate it: `openfde fde` (prints) or
+   `openfde fde --write` (writes `./FDE.md`, keeping the FDE's notes block).
+3. If the command fails with "no engagement selected", ask the human which
+   engagement to use — never create one on your own.
+
+Then follow FDE.md. `openfde --help` and `openfde <verb> --help` are the
+authoritative reference for every command; all of them accept `--json`.
+
+## Install the CLI (one-time, when `openfde` is missing)
 
 Prerequisites: Node.js >= 22 and pnpm.
 
 ```sh
 git clone https://github.com/memovai/openfde.git
-cd openfde
-pnpm install
-pnpm -C apps/cli build
+cd openfde && pnpm install && pnpm -C apps/cli build
 npm link ./apps/cli        # exposes the `openfde` binary on PATH
-openfde --version          # verify
+openfde --version
 ```
 
-Optional environment:
+Environment: `ANTHROPIC_API_KEY` only for `extract`, `research`, and `eval`
+without `--mock`; `OPENFDE_ACTOR` is your name in audit trails (set it to
+your agent name); `OPENFDE_HOME` moves the data directory.
 
-- `ANTHROPIC_API_KEY` — required only for `extract` (LLM extraction),
-  `research` (web search), and `eval` without `--mock`.
-- `OPENFDE_ACTOR` — your identity in audit trails (defaults to `$USER`).
-  As a coding agent, set it: `export OPENFDE_ACTOR=claude-code`.
-- `OPENFDE_HOME` — data location (defaults to `~/.openfde`).
+To install this skill: copy this directory to `.claude/skills/openfde/`
+(project) or `~/.claude/skills/openfde/` (user).
 
-To install this skill itself, copy this directory into the project
-(`.claude/skills/openfde/`) or user scope (`~/.claude/skills/openfde/`).
+## The two rules that survive any brief
 
-## The engagement
-
-All data lives in one engagement (customer project) at a time:
-
-```sh
-openfde engagement list            # * marks the current one
-openfde engagement use <slug>      # switch
-openfde status                     # counts: episodes, facts, open tasks
-```
-
-If a command fails with "no engagement selected", ask the human which
-engagement to use — do not create one on your own.
-
-## The loop you run as an agent
-
-```sh
-# 1. find work
-openfde task list --status ready --json
-
-# 2. claim it and pull the ammunition pack BEFORE touching code
-openfde task claim <id>
-openfde context <id>          # constraints first, related memory after — read all of it
-
-# 3. work; report progress as you go
-openfde task start <id>
-openfde task update <id> --note "found the export job config"
-
-# 4. record discoveries the moment you make them (provenance is mandatory)
-openfde remember "the nightly export runs at 02:00 UTC, owned by Wang" \
-  --source "repo://acme/etl/cron.tf#L14"
-
-# 5. submit for review
-openfde task done <id> --note "ready for eval"
-```
-
-Never skip step 2: the context bundle leads with **constraints** (security
-rules, compliance limits). A demo or change that violates one kills the
-engagement's trust.
-
-## Memory verbs
-
-```sh
-openfde recall <query> --json               # hybrid search: rank-fused, scored, citations included
-openfde recall <query> --mode handoff       # timeline incl. superseded facts
-openfde whoknows <topic> --json             # who is the expert — evidence-cited people ranking
-openfde path <a> <b> --json                 # shortest chain of cited facts between two entities
-openfde ontology --json                     # the schema: type meanings, relation domain/range, counts, health
-openfde remember "<fact>" --source <uri>    # write back; source URI is REQUIRED
-openfde ingest notes.md --kind message --speaker Wang    # files, PDFs, images
-openfde extract                              # structure pending episodes (needs API key)
-```
-
-Rules:
-- Everything you `remember` must carry a real `--source` (file path, URL,
-  repo path, meeting reference). Sourceless writes are rejected by design.
-- `recall` is milliseconds and LLM-free — prefer it over guessing customer
-  facts from your own context.
-- When `recall` reports matching unextracted episodes, run `openfde extract`
-  before concluding the memory has nothing on the topic.
-- Relations have declared subject/object types (`openfde ontology`). A fact that does not fit is stored as `RELATES_TO`; when writing facts, pick the specific relation whose types match.
-
-## When the runner spawned you
-
-If `OPENFDE_RUN_ID` is set, a human started you with `openfde run` in a git
-worktree made for this task. The CLI already targets the right engagement
-(`OPENFDE_ENGAGEMENT`), your prompt carries the context pack, and you must
-not open interactive questions — nobody is watching the terminal. Commit on
-the task branch, use `remember` for discoveries, and end your final message
-with exactly one line: `DONE: <summary>`, `BLOCKED: <reason>`, or
-`NEEDS_HUMAN: <question>`. The runner moves the task; do not call `task done`.
-
-## Field tools
-
-```sh
-openfde research "<how do others solve X>" --save   # web search, cited; --save ingests findings
-openfde demo <topic> --save                          # demo brief: pain, vocabulary, constraints, data shapes
-openfde interview --mode top-down                    # boss-session questions from graph gaps
-openfde interview --mode bottom-up                   # knowledge-mining leads
-openfde datamap                                      # who owns / trusts / depends on each data source
-openfde flows                                        # auto-extracted mermaid flow diagrams (goals, steps, blockers)
-openfde report                                       # executive report (markdown)
-```
-
-## Pages
-
-Free-form markdown documents (runbooks, plans, deliverables) that live next
-to the ledger. Humans block-edit them in the workspace; you read and write
-the same files:
-
-```sh
-openfde page list --json
-openfde page show <slug>
-openfde page add "Rollout plan" --file ./plan.md
-openfde page edit <slug> --file ./updated.md
-```
-
-Use pages for narrative deliverables; use `remember` for facts. A fact
-buried in a page is invisible to `recall` until you record it.
-
-The canvas (`openfde canvas show/add`) is the human's free-form thinking
-surface — read it for context; add a card only when asked.
-
-## Eval and assets
-
-Task acceptance criteria become rubric assets automatically. When you finish
-a piece of work, judge it before asking a human to review:
-
-```sh
-openfde eval <taskId> --input ./summary-of-work.md   # LLM judge (or --mock)
-openfde asset list                                   # rubrics, prompts, eval cases, demos
-openfde asset show rubric <name>
-openfde asset add prompt "extraction tone" --file ./prompt.md
-```
-
-Verdicts append to the task's audit trail and grow the per-rubric
-`.cases.jsonl` dataset.
-
-## Ground rules
-
-1. **Cite or it didn't happen.** Every fact you rely on should come from
-   `recall`/`context` output (which carries sources), not from your priors.
-2. **Constraints outrank everything** — including the human's phrasing of the
-   task. If a task conflicts with a recorded constraint, say so in a
-   `task update --note` and pause.
-3. **Write back as you learn.** A discovery not recorded with `remember` is
-   lost to the next agent and to the handoff.
-4. **State transitions, never silence.** Finish with `task done`, block with
-   an explanatory note, abandon with `task ready`. The audit trail is the
-   human's window into your work.
-5. The web workspace (`openfde serve`, `/report`, `openfde share`) is for
-   humans; do not scrape it — everything it shows comes from these commands.
+1. **Cite or it didn't happen.** Facts come from `openfde recall` with their
+   sources, never from your priors. Write back with `openfde remember
+   "<fact>" --source <uri>`; the source is mandatory.
+2. **Constraints outrank the task wording.** If a task conflicts with a
+   recorded constraint, stop, note it on the task, and wait.
