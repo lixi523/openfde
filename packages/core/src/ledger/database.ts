@@ -83,6 +83,33 @@ CREATE TABLE IF NOT EXISTS task_events (
 );
 CREATE INDEX IF NOT EXISTS idx_task_events_task ON task_events(task_id);
 
+-- Orchestrated runs (Mode A): one row per agent process the runner spawned for a task.
+-- The task table stays the single source of truth for state; runs record how the work happened.
+CREATE TABLE IF NOT EXISTS runs (
+  id TEXT PRIMARY KEY,
+  task_id TEXT NOT NULL REFERENCES tasks(id),
+  parent_run_id TEXT REFERENCES runs(id),
+  executor TEXT NOT NULL,
+  repo TEXT NOT NULL,
+  worktree TEXT,
+  branch TEXT,
+  session_id TEXT,
+  status TEXT NOT NULL
+    CHECK (status IN ('starting','running','done','blocked','needs_human','failed','killed')),
+  exit_marker TEXT,
+  summary TEXT,
+  cost_usd REAL,
+  turns INTEGER,
+  tool_calls INTEGER NOT NULL DEFAULT 0,
+  exit_code INTEGER,
+  log_path TEXT NOT NULL,
+  pid INTEGER,
+  started_at TEXT NOT NULL,
+  heartbeat_at TEXT,
+  ended_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_runs_task ON runs(task_id);
+
 -- FTS content is maintained by the write path (CJK segmentation happens in app code; SQL triggers cannot do it)
 CREATE VIRTUAL TABLE IF NOT EXISTS fact_fts USING fts5(
   statement, quote, fact_id UNINDEXED

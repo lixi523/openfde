@@ -103,6 +103,16 @@ Rules:
   before concluding the memory has nothing on the topic.
 - Relations have declared subject/object types (`openfde ontology`). A fact that does not fit is stored as `RELATES_TO`; when writing facts, pick the specific relation whose types match.
 
+## When the runner spawned you
+
+If `OPENFDE_RUN_ID` is set, a human started you with `openfde run` in a git
+worktree made for this task. The CLI already targets the right engagement
+(`OPENFDE_ENGAGEMENT`), your prompt carries the context pack, and you must
+not open interactive questions — nobody is watching the terminal. Commit on
+the task branch, use `remember` for discoveries, and end your final message
+with exactly one line: `DONE: <summary>`, `BLOCKED: <reason>`, or
+`NEEDS_HUMAN: <question>`. The runner moves the task; do not call `task done`.
+
 ## Field tools
 
 ```sh

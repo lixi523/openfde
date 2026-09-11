@@ -58,6 +58,54 @@ export {
   contextMarkdown,
   type TaskContext,
 } from "./dispatch/context.js";
+// orchestrated runner (Mode A): worktrees, executors, runs
+export {
+  ensureWorktree,
+  listWorktrees,
+  removeWorktree,
+  worktreeStatus,
+  taskBranch,
+  isGitRepo,
+  currentBranch,
+  type WorktreeInfo,
+  type WorktreeStatus,
+} from "./dispatch/worktree.js";
+export {
+  ClaudeCodeExecutor,
+  CodexExecutor,
+  MockExecutor,
+  executorByName,
+  claudeArgs,
+  codexArgs,
+  parseClaudeLine,
+  parseCodexLine,
+  type AgentEvent,
+  type Executor,
+  type PermissionLevel,
+  type SpawnInput,
+  type MockScript,
+} from "./dispatch/executors.js";
+export {
+  createRun,
+  getRun,
+  listRuns,
+  latestRun,
+  updateRun,
+  RUN_STATUSES,
+  type RunRow,
+  type RunStatus,
+} from "./dispatch/runs.js";
+export {
+  runTask,
+  followUpRun,
+  runReadyTasks,
+  buildRunPrompt,
+  parseExitMarker,
+  ensureCliOnPath,
+  type RunOptions,
+  type RunOutcome,
+  type ExitMarker,
+} from "./dispatch/runner.js";
 
 // projections (markdown views of the ledger — shared by webui and future export)
 export { buildDataMap, dataMapMarkdown, type DataSourceMap } from "./projections/datamap.js";

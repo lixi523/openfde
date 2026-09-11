@@ -56,13 +56,14 @@ export function useEngagement(slug: string): void {
   writeConfig(config);
 }
 
-/** Resolve the active engagement: explicit arg > global config. Fails loudly — every data operation must have a clear owner. */
+/** Resolve the active engagement: explicit arg > OPENFDE_ENGAGEMENT (set by the runner for spawned agents) > global config. Fails loudly — every data operation must have a clear owner. */
 export function resolveEngagement(explicit?: string): string {
-  if (explicit) {
-    if (!existsSync(engagementDir(explicit))) {
-      throw new Error(`engagement "${explicit}" does not exist`);
+  const chosen = explicit ?? process.env.OPENFDE_ENGAGEMENT;
+  if (chosen) {
+    if (!existsSync(engagementDir(chosen))) {
+      throw new Error(`engagement "${chosen}" does not exist`);
     }
-    return explicit;
+    return chosen;
   }
   const config = readConfig();
   if (config.currentEngagement && existsSync(engagementDir(config.currentEngagement))) {

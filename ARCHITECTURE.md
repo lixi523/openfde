@@ -45,9 +45,15 @@ packages/
         extractor.ts        #   the Extractor interface
         anthropic.ts        #   Claude structured-output implementation
         mock.ts             #   offline/deterministic implementation for tests
-      dispatch/             # agent-pull task coordination (Mode B)
+      dispatch/             # task coordination: agent-pull (Mode B) + orchestrated runner (Mode A)
         tasks.ts            #   task cards, state machine, audit events
         context.ts          #   context bundles: constraints + related memory
+        worktree.ts         #   Mode A: one git worktree + branch per task, status, safe removal
+        executors.ts        #   Mode A: headless agents (claude -p stream-json, codex exec --json)
+                            #   normalized into one AgentEvent stream; MockExecutor for tests
+        runs.ts             #   Mode A: run records (executor, worktree, session id, cost, marker)
+        runner.ts           #   Mode A: claim -> worktree -> prompt -> stream -> exit marker -> transition;
+                            #   follow-ups resume the same session; fan-out with a concurrency cap
       assets/               # the asset library: files, git-ready
         store.ts            #   rubrics/prompts/eval cases/demos/playbooks/skills
       eval/                 # acceptance judging against rubric assets
@@ -96,8 +102,8 @@ apps/
     src/
       index.ts              #   thin assembler; registers commands
       commands/             #   one file per verb (engagement, ingest, extract,
-                            #   recall, remember, task, context, ontology, path, report,
-                            #   status, serve)
+                            #   recall, remember, task, context, run, worktree, ontology,
+                            #   path, report, status, serve)
       lib/helpers.ts        #   fail / withLedger / actorName
 ```
 
@@ -108,7 +114,7 @@ apps/
 | Ingestion connectors (Slack/Teams exports) | `packages/core/src/ingestion/` | parsers normalize sources into `IngestInput`; PDFs/images already ship via Claude-native blocks; MinerU stays an isolated external service |
 | Asset promotion (engagement → team repo) | `packages/core/src/assets/` | shipped per-engagement; promotion goes behind a desensitization gate + cross-engagement leverage metrics |
 | Eval backends (Langfuse sync) | `packages/core/src/eval/` | judging shipped; optional observability backend remains |
-| Orchestrated dispatch runner (Mode A) | `packages/core/src/dispatch/runner/` | optional daemon spawning agents on `ready` tasks in git worktrees; same task table |
+| Runner daemon / hooks-based status | `packages/core/src/dispatch/runner.ts` | `openfde run ready` is one-shot today; a watch mode plus Claude Code Stop/PostToolUse hooks (the Orca pattern) would push status instead of the runner reading the stream |
 | Vault export of markdown notes | `apps/cli/src/commands/export.ts` | reuse `core/src/projections/` |
 | Embedding recall (sqlite-vec) | `packages/core/src/ledger/` | slots into `recall.ts` as one more ranked list in the RRF fusion — catches paraphrase the lexical lists miss; interface unchanged |
 | Answer synthesis (`openfde ask`) | `apps/cli/src/commands/ask.ts` | planner → parallel retrieval fan-out → cited synthesis; LLM stays at the answer layer, retrieval primitives stay LLM-free |

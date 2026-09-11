@@ -1,3 +1,5 @@
+| `openfde run <task> --repo <path> --agent claude|codex` | Dispatch orquestado: lanza un coding agent en el worktree git propio de la tarea con el paquete de contexto citado, transmite su trabajo al registro de auditoría y avanza la tarea según su marcador de salida (`DONE` / `BLOCKED` / `NEEDS_HUMAN`); `run ready` reparte en paralelo, `run followup` continúa la misma sesión con comentarios de revisión |
+| `openfde worktree list/open/remove` | Worktrees de tarea creados por el runner: rama, commits por delante de la base, archivos sin commit; la eliminación rechaza descartar trabajo sin fusionar |
 | `openfde ontology` | La ontología como artefacto: qué significa cada tipo, instancias por tipo, entidades huérfanas, violaciones de esquema; `--rdf` exporta RDF/OWL (clases, relaciones, individuos, hechos con procedencia) |
 | `openfde path <a> <b>` | La cadena más corta de hechos citados que conecta dos entidades |
 # OpenFDE: AI workspace for FDEs
@@ -6,7 +8,7 @@
 
 > **Entrega soluciones de IA 100x más rápido.** Las entrevistas se vuelven memoria, la memoria tareas trazables, y las tareas trabajo para coding agents — con evals como puerta de control.
 
-**OpenFDE** es un espacio de trabajo de IA, local-first, para forward deployed engineers. Compila el material del engagement — entrevistas, registros de chat, documentos, PDF, imágenes — en una memoria operativa respaldada por ontología, y cierra el bucle entre humanos y coding agents: los agents reclaman tareas y paquetes de contexto del ledger, ejecutan y devuelven hallazgos — mientras la dirección del cliente observa el progreso en vivo, con cada afirmación citando su fuente.
+**OpenFDE** es un espacio de trabajo de IA, local-first, para forward deployed engineers. Piénsalo como un **cerebro empresarial construido a la manera de la ontología**: la organización del cliente — sus objetivos, workflows, decisiones, restricciones, fuentes de datos, personas y dolores — capturada como un grafo tipado, citado y consciente del tiempo, del que leen y al que escriben tanto humanos como coding agents. Compila el material del engagement — entrevistas, registros de chat, documentos, PDF, imágenes — en una memoria operativa respaldada por ontología, y cierra el bucle entre humanos y coding agents: los agents reclaman tareas y paquetes de contexto del ledger, ejecutan y devuelven hallazgos — mientras la dirección del cliente observa el progreso en vivo, con cada afirmación citando su fuente.
 
 ![Interfaz de notas de openfde](./docs/notes-ui.png)
 

@@ -23,6 +23,16 @@ export function rawDir(slug: string): string {
   return join(engagementDir(slug), "raw");
 }
 
+/** Git worktrees the runner creates, one per task */
+export function worktreesDir(slug: string): string {
+  return join(engagementDir(slug), "worktrees");
+}
+
+/** Normalized agent event logs, one JSONL file per run */
+export function runsDir(slug: string): string {
+  return join(engagementDir(slug), "runs");
+}
+
 export function globalConfigPath(): string {
   return join(openfdeHome(), "config.json");
 }

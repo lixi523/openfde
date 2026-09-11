@@ -1,5 +1,6 @@
 import type { Ledger } from "../ledger/database.js";
 import { getTask, listTasks, taskEvents, TASK_STATUSES } from "../dispatch/tasks.js";
+import { listRuns } from "../dispatch/runs.js";
 import { entityFlow } from "./flows.js";
 
 /**
@@ -147,12 +148,35 @@ export function taskNote(db: Ledger, id: string): string | null {
     );
   }
 
+  const runs = listRuns(db, { taskId: id });
+  if (runs.length > 0) {
+    md.push(`## Runs (${runs.length})`, "");
+    for (const run of runs) {
+      const bits = [
+        `\`${run.status}\``,
+        run.executor,
+        run.branch ? `branch \`${run.branch}\`` : "no worktree",
+        run.tool_calls ? `${run.tool_calls} tool calls` : null,
+        run.cost_usd !== null ? `$${run.cost_usd.toFixed(2)}` : null,
+        run.parent_run_id ? `follow-up of ${run.parent_run_id}` : null,
+      ].filter(Boolean);
+      md.push(`- **${run.id}** — ${bits.join(" · ")}`);
+      if (run.summary) {
+        const prefix = run.exit_marker ? `${run.exit_marker}: ` : "";
+        md.push(`  ${prefix}${run.summary.replace(/\n/g, " ").slice(0, 400)}`);
+      }
+      const ended = run.ended_at ? ` → ${run.ended_at.slice(11, 19)}` : "";
+      md.push(`  <small>${run.started_at.slice(0, 19).replace("T", " ")}${ended} · log ${run.log_path}</small>`, "");
+    }
+  }
+
   md.push(
     "## Work with it",
     "",
     "```",
     `openfde context ${task.id}`,
     `openfde task claim ${task.id} && openfde task start ${task.id}`,
+    `openfde run ${task.id} --repo <path> --agent claude`,
     "```",
   );
   return md.join("\n");

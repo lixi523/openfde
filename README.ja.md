@@ -1,3 +1,5 @@
+| `openfde run <task> --repo <path> --agent claude|codex` | オーケストレーション型ディスパッチ：タスク専用の git worktree で coding agent を起動し、出典付き context パックを渡し、作業を監査ログにストリームし、終了マーカー（`DONE` / `BLOCKED` / `NEEDS_HUMAN`）からタスクを進める；`run ready` でファンアウト、`run followup` でレビュー内容を同じセッションに続ける |
+| `openfde worktree list/open/remove` | runner が作ったタスク worktree：ブランチ、base より先のコミット数、未コミットファイル；未マージの作業は削除を拒否 |
 | `openfde ontology` | オントロジーを成果物として：各タイプの意味、インスタンス数、孤立エンティティ、スキーマ違反；`--rdf` で RDF/OWL を出力（クラス、関係、個体、出典付きの事実） |
 | `openfde path <a> <b>` | 2 つのエンティティを結ぶ最短の事実の連鎖——各ホップに出典付き |
 # OpenFDE: AI workspace for FDEs
@@ -6,7 +8,7 @@
 
 > **AI ソリューションを 100 倍速くデリバリーする。** インタビューはメモリに、メモリは追跡可能なタスクに、タスクは coding agent の仕事に——eval がゲートする。
 
-**OpenFDE** は FDE（Forward Deployed Engineer）のためのローカルファーストな AI ワークスペースです。エンゲージメント資料——インタビュー、チャットログ、ドキュメント、PDF、画像——をオントロジーに支えられた運用メモリへとコンパイルし、人間と coding agent のループを閉じます：agent は ledger からタスクとコンテキストパックを取得し、実行し、発見を書き戻します——顧客の経営層は進捗をリアルタイムで見られ、すべての主張に出典がつきます。
+**OpenFDE** は FDE（Forward Deployed Engineer）のためのローカルファーストな AI ワークスペースです。 これは**オントロジーの方法で構築されたエンタープライズ・ブレイン**です：顧客組織のゴール、ワークフロー、意思決定、制約、データソース、人、課題を、型と出典と時間軸を持つグラフとして捉え、人間と coding agent の両方がそこから読み、書き戻します。エンゲージメント資料——インタビュー、チャットログ、ドキュメント、PDF、画像——をオントロジーに支えられた運用メモリへとコンパイルし、人間と coding agent のループを閉じます：agent は ledger からタスクとコンテキストパックを取得し、実行し、発見を書き戻します——顧客の経営層は進捗をリアルタイムで見られ、すべての主張に出典がつきます。
 
 ![openfde ノート UI](./docs/notes-ui.png)
 

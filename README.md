@@ -1,3 +1,5 @@
+| `openfde run <task> --repo <path> --agent claude|codex` | Orchestrated dispatch: spawn a coding agent in the task's own git worktree with the cited context pack, stream its work into the audit trail, and move the task on from its exit marker (`DONE` / `BLOCKED` / `NEEDS_HUMAN`); `run ready` fans out, `run followup` continues the same session with review feedback |
+| `openfde worktree list/open/remove` | Task worktrees the runner created: branch, commits ahead of base, dirty files; removal refuses to drop unmerged work |
 | `openfde ontology` | The ontology as an artifact: what each type means, instances per type, orphans, schema violations; `--rdf` exports RDF/OWL (classes, relations, individuals, facts with provenance) |
 | `openfde path <a> <b>` | Shortest chain of cited facts connecting two entities — how the CFO relates to the reconciliation workflow |
 # OpenFDE: AI workspace for FDEs
@@ -6,7 +8,7 @@
 
 > **Deliver AI solutions 100x faster.** Interviews become memory, memory becomes traceable todos, todos become coding-agent work — gated by evals.
 
-**OpenFDE** is a local-first AI workspace for forward deployed engineers. It compiles engagement material — interviews, chat logs, documents, PDFs, images — into an ontology-backed operational memory, and closes the loop between humans and coding agents: agents pull tasks and context bundles from the ledger, execute, and write findings back — while the customer's leadership watches progress live, with every claim citing its source.
+**OpenFDE** is a local-first AI workspace for forward deployed engineers. Think of it as an **enterprise brain built the ontology way**: the customer organization — its goals, workflows, decisions, constraints, data sources, people and pains — captured as a typed, cited, time-aware graph that both humans and coding agents read from and write back to. It compiles engagement material — interviews, chat logs, documents, PDFs, images — into an ontology-backed operational memory, and closes the loop between humans and coding agents: agents pull tasks and context bundles from the ledger, execute, and write findings back — while the customer's leadership watches progress live, with every claim citing its source.
 
 ![openfde notes UI](./docs/notes-ui.png)
 
@@ -97,7 +99,7 @@ pnpm openfde serve                          # workspace at :4517, printable repo
 
 ## Agent integration
 
-Humans use the web workspace; **agents use the CLI, taught as a skill**. Install the bundled skill into your agent:
+Humans use the web workspace; **agents use the CLI, taught as a skill**. Two dispatch modes share one task table: **agent-pull** (your own Claude Code/Codex session claims tasks through the CLI) and **orchestrated** (`openfde run` spawns a headless agent per task in its own git worktree, streams its events into the audit trail, and moves the task on from its `DONE` / `BLOCKED` / `NEEDS_HUMAN` exit marker). Install the bundled skill into your agent:
 
 ```sh
 cp -r skills/openfde ~/.claude/skills/openfde     # user scope

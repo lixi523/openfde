@@ -1,3 +1,5 @@
+| `openfde run <task> --repo <path> --agent claude|codex` | 编排式派发：在任务专属的 git worktree 里拉起 coding agent，喂入带引用的 context 包，把它的工作流式写进审计轨迹，并根据退出标记（`DONE` / `BLOCKED` / `NEEDS_HUMAN`）推进任务；`run ready` 批量扇出，`run followup` 带着评审意见续同一个会话 |
+| `openfde worktree list/open/remove` | runner 创建的任务 worktree：分支、领先 base 的提交数、未提交文件；删除时拒绝丢弃未合并的工作 |
 | `openfde ontology` | 本体即制品：每种类型的含义、实例数、孤儿实体、schema 违规；`--rdf` 导出 RDF/OWL（类、关系、个体、带出处的事实） |
 | `openfde path <a> <b>` | 连接两个实体的最短事实链，每一跳都有出处——CFO 和对账流程是怎么关联起来的 |
 # OpenFDE: AI workspace for FDEs
@@ -6,7 +8,7 @@
 
 > **以 100 倍速度交付 AI 解决方案。** 访谈变成记忆，记忆变成可追踪的任务，任务交给 coding agent 执行——由 eval 把关。
 
-**OpenFDE** 是为 FDE（Forward Deployed Engineer）打造的本地优先 AI 工作台。它把 engagement 材料——访谈、聊天记录、文档、PDF、图片——编译成本体支撑的运营记忆，并让人和 coding agent 形成闭环：agent 从 ledger 认领任务、拉取上下文包、执行并回写发现——客户管理层实时看到进展，每条结论都有出处。
+**OpenFDE** 是为 FDE（Forward Deployed Engineer）打造的本地优先 AI 工作台。 可以把它理解为**用本体论方式构建的企业大脑**：客户组织的目标、工作流、决策、约束、数据源、人和痛点，被沉淀为一张有类型、有出处、有时间维度的图，人和 coding agent 都从这张图读取，也往回写。它把 engagement 材料——访谈、聊天记录、文档、PDF、图片——编译成本体支撑的运营记忆，并让人和 coding agent 形成闭环：agent 从 ledger 认领任务、拉取上下文包、执行并回写发现——客户管理层实时看到进展，每条结论都有出处。
 
 ![openfde 笔记界面](./docs/notes-ui.png)
 

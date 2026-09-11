@@ -22,6 +22,8 @@ import { registerShare } from "./commands/share.js";
 import { registerWhoknows } from "./commands/whoknows.js";
 import { registerOntology } from "./commands/ontology.js";
 import { registerPath } from "./commands/path.js";
+import { registerRun } from "./commands/run.js";
+import { registerWorktree } from "./commands/worktree.js";
 
 const program = new Command();
 program
@@ -40,6 +42,8 @@ registerWhoknows(program);
 registerPath(program);
 registerTask(program);
 registerContext(program);
+registerRun(program);
+registerWorktree(program);
 registerResearch(program);
 registerDemo(program);
 registerEval(program);
