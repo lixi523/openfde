@@ -75,6 +75,20 @@ export {
   type ExpertEvidence,
 } from "./projections/whoknows.js";
 export {
+  buildOntologyView,
+  ontologyMarkdown,
+  ontologyRdf,
+  findPath,
+  pathMarkdown,
+  type OntologyView,
+  type EntityTypeStat,
+  type RelationTypeStat,
+  type SchemaViolation,
+  type PathResult,
+  type PathHop,
+  type RdfOptions,
+} from "./projections/ontology.js";
+export {
   loadTree,
   entityNote,
   episodeNote,

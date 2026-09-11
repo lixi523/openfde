@@ -87,6 +87,8 @@ engagement's trust.
 openfde recall <query> --json               # hybrid search: rank-fused, scored, citations included
 openfde recall <query> --mode handoff       # timeline incl. superseded facts
 openfde whoknows <topic> --json             # who is the expert — evidence-cited people ranking
+openfde path <a> <b> --json                 # shortest chain of cited facts between two entities
+openfde ontology --json                     # the schema: type meanings, relation domain/range, counts, health
 openfde remember "<fact>" --source <uri>    # write back; source URI is REQUIRED
 openfde ingest notes.md --kind message --speaker Wang    # files, PDFs, images
 openfde extract                              # structure pending episodes (needs API key)
@@ -99,6 +101,7 @@ Rules:
   facts from your own context.
 - When `recall` reports matching unextracted episodes, run `openfde extract`
   before concluding the memory has nothing on the topic.
+- Relations have declared subject/object types (`openfde ontology`). A fact that does not fit is stored as `RELATES_TO`; when writing facts, pick the specific relation whose types match.
 
 ## Field tools
 

@@ -39,7 +39,8 @@ export function registerExtract(program: Command): void {
           else
             console.log(
               `Processed ${stats.episodes} episode(s): +${stats.facts.ADD} facts, ` +
-                `${stats.facts.INVALIDATE} superseded, ${stats.facts.NOOP} deduped, ${stats.failed} failed`,
+                `${stats.facts.INVALIDATE} superseded, ${stats.facts.NOOP} deduped, ${stats.failed} failed` +
+                (stats.coerced ? `, ${stats.coerced} coerced to RELATES_TO (relation did not fit its types)` : ""),
             );
         } catch (error) {
           fail(error);

@@ -1,16 +1,18 @@
 import { readFileSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import { ExtractionResult, ENTITY_TYPES, RELATION_TYPES } from "@openfde/ontology";
+import { ExtractionResult, describeOntology } from "@openfde/ontology";
 import type { Extractor, EpisodeInput } from "./extractor.js";
 
+// The ontology describes itself (packages/ontology/src/schema.ts): type meanings and
+// relation domain/range reach the model verbatim, so the prompt never drifts from the schema.
 const SYSTEM = `You are the engagement-memory extractor for an FDE (Forward Deployed Engineer) team.
 The input is a piece of customer material (interview notes, chat logs, document fragments), possibly in any language. Extract entities and facts strictly within the fixed ontology.
 
-Entity types (no others allowed): ${ENTITY_TYPES.join(", ")}
-Relation types (no others allowed): ${RELATION_TYPES.join(", ")}
+${describeOntology()}
 
 Rules:
+- Respect each relation's subject -> object types. If no specific relation fits a connection, use RELATES_TO rather than bending another relation.
 - Extract only what the source explicitly supports; never speculate. Every fact's quote must be copied verbatim from the source.
 - Prioritize five high-value signals: organizational goals and value statements (Goal + SUPPORTS — what outcomes matter and which workflows deliver them); who trusts/distrusts which data source (TRUSTS + trust field); decisions and their rationale (Decision + RATIONALE/DECIDED_BY); workflows and step dependencies (Workflow/WorkflowStep + DEPENDS_ON/PART_OF); constraints and blockers (Constraint + BLOCKS).
 - Write each statement as a complete sentence understandable without the source text, in the source's language.

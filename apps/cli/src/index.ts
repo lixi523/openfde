@@ -20,6 +20,8 @@ import { registerStatus } from "./commands/status.js";
 import { registerServe } from "./commands/serve.js";
 import { registerShare } from "./commands/share.js";
 import { registerWhoknows } from "./commands/whoknows.js";
+import { registerOntology } from "./commands/ontology.js";
+import { registerPath } from "./commands/path.js";
 
 const program = new Command();
 program
@@ -35,6 +37,7 @@ registerExtract(program);
 registerRecall(program);
 registerRemember(program);
 registerWhoknows(program);
+registerPath(program);
 registerTask(program);
 registerContext(program);
 registerResearch(program);
@@ -44,6 +47,7 @@ registerAsset(program);
 registerCanvas(program);
 registerDatamap(program);
 registerFlows(program);
+registerOntology(program);
 registerPage(program);
 registerInterview(program);
 registerReport(program);

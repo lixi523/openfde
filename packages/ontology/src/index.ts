@@ -8,3 +8,4 @@ export * from "./entities.js";
 export * from "./relations.js";
 export * from "./episodes.js";
 export * from "./extraction.js";
+export * from "./schema.js";

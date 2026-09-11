@@ -153,6 +153,8 @@
     padding: 7px 0;
   }
   #report-link:hover { border-color: var(--accent); color: var(--text); }
+  #schema-link { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+  #schema-link:hover { color: var(--accent); }
 
   #sidebar footer { font-size: 11px; color: var(--text-faint); padding: 4px 6px; line-height: 1.6; }
   #sidebar footer code {
@@ -432,6 +434,7 @@
       <label class="small">Entity types</label>
       <div id="legend"></div>
     </div>
+    <a id="schema-link" href="#" onclick="openView('ontology'); return false;">Schema &amp; health →</a>
     <label class="toggle-row">
       <input type="checkbox" id="show-expired" />
       <span>Show superseded facts</span>
@@ -809,6 +812,7 @@ const VIEWS_SECTION = {
     label: "Projections",
     items: [
       { id: "view:flows", label: "Flows" },
+      { id: "view:ontology", label: "Ontology schema" },
       { id: "view:interview-top", label: "Interview · top-down" },
       { id: "view:interview-bottom", label: "Interview · bottom-up" },
       { id: "view:datamap", label: "Data map" },

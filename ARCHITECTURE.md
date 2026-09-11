@@ -11,7 +11,7 @@ flowchart LR
   ep -->|extract| facts["entities + facts"]
   facts -->|recall / context| work["humans + coding agents"]
   work -->|remember / task| ledger["engagement ledger"]
-  ledger -->|projections| views["notes · graph · flows · data map · report"]
+  ledger -->|projections| views["notes · graph · ontology · flows · data map · report"]
 ```
 
 ## Repository layout
@@ -21,6 +21,8 @@ packages/
   ontology/                 # THE single source of truth for the domain model
     src/
       entities.ts           #   entity types + trust levels
+      schema.ts             #   what each type means, relation domain/range/cardinality;
+                            #   feeds the extraction prompt, write-path coercion, RDF export
       relations.ts          #   relation types
       episodes.ts           #   ingestion unit kinds
       extraction.ts         #   LLM structured-output schemas (Zod)
@@ -61,6 +63,8 @@ packages/
         datamap.ts          #   the data negotiation map (owners / trust / dependents)
         flows.ts            #   auto-extracted mermaid flow diagrams (goals/steps/blockers)
         whoknows.ts         #   "who is the expert in Y" — evidence-cited people ranking
+        ontology.ts         #   the ontology as an artifact: schema view (counts, orphans,
+                            #   domain/range violations), RDF/OWL export, cited path finding
       pages/                # free-form markdown documents next to the ledger
         store.ts            #   create/list/read/write/delete; block-edited in the webui
       canvas/               # free-form spatial cards per engagement
@@ -74,7 +78,7 @@ packages/
     src/
       server.ts             #   node:http API + routes (launched by `openfde serve`);
                             #   /api/view mirrors CLI projections (interview, datamap,
-                            #   assets, flows); /api/page|canvas|task mirror the
+                            #   assets, flows, ontology); /api/page|canvas|task mirror the
                             #   corresponding CLI verbs
       report-page.ts        #   printable executive report page
       index.html            #   zero-dependency workspace UI, four tabs:
@@ -92,7 +96,8 @@ apps/
     src/
       index.ts              #   thin assembler; registers commands
       commands/             #   one file per verb (engagement, ingest, extract,
-                            #   recall, remember, task, context, report, status, serve)
+                            #   recall, remember, task, context, ontology, path, report,
+                            #   status, serve)
       lib/helpers.ts        #   fail / withLedger / actorName
 ```
 

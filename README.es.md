@@ -1,3 +1,5 @@
+| `openfde ontology` | La ontología como artefacto: qué significa cada tipo, instancias por tipo, entidades huérfanas, violaciones de esquema; `--rdf` exporta RDF/OWL (clases, relaciones, individuos, hechos con procedencia) |
+| `openfde path <a> <b>` | La cadena más corta de hechos citados que conecta dos entidades |
 # OpenFDE: AI workspace for FDEs
 
 [English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md) | **Español**

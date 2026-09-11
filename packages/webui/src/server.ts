@@ -5,6 +5,7 @@ import {
   buildDataMap,
   buildFlows,
   buildInterviewGuide,
+  buildOntologyView,
   buildOverviewFlow,
   buildReport,
   createPage,
@@ -16,6 +17,7 @@ import {
   listAssets,
   listPages,
   listTasks,
+  ontologyMarkdown,
   episodeNote,
   listEngagements,
   loadTree,
@@ -156,6 +158,8 @@ function viewMarkdown(slug: string, kind: string): string | null {
         const overview = buildOverviewFlow(db);
         return flowsMarkdown([...(overview ? [overview] : []), ...buildFlows(db)], slug);
       }
+      case "ontology":
+        return ontologyMarkdown(buildOntologyView(db), slug);
       case "assets":
         return assetsMarkdown(slug);
       default:

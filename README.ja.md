@@ -1,3 +1,5 @@
+| `openfde ontology` | オントロジーを成果物として：各タイプの意味、インスタンス数、孤立エンティティ、スキーマ違反；`--rdf` で RDF/OWL を出力（クラス、関係、個体、出典付きの事実） |
+| `openfde path <a> <b>` | 2 つのエンティティを結ぶ最短の事実の連鎖——各ホップに出典付き |
 # OpenFDE: AI workspace for FDEs
 
 [English](./README.md) | [简体中文](./README.zh-CN.md) | **日本語** | [Español](./README.es.md)

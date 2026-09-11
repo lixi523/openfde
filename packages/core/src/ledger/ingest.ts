@@ -1,4 +1,4 @@
-import { ExtractionResult, type EpisodeKind } from "@openfde/ontology";
+import { ExtractionResult, relationFits, type EntityType, type EpisodeKind } from "@openfde/ontology";
 import type { Ledger } from "./database.js";
 import { newId, nowIso } from "./database.js";
 import type { Extractor } from "../extraction/extractor.js";
@@ -65,6 +65,8 @@ export interface ExtractionStats {
   episodes: number;
   entities: number;
   facts: { ADD: number; UPDATE: number; INVALIDATE: number; NOOP: number };
+  /** Facts whose relation violated its domain/range and were coerced to RELATES_TO */
+  coerced: number;
   failed: number;
 }
 
@@ -78,6 +80,7 @@ export async function runExtraction(db: Ledger, extractor: Extractor): Promise<E
     episodes: 0,
     entities: 0,
     facts: { ADD: 0, UPDATE: 0, INVALIDATE: 0, NOOP: 0 },
+    coerced: 0,
     failed: 0,
   };
 
@@ -102,16 +105,28 @@ export async function runExtraction(db: Ledger, extractor: Extractor): Promise<E
 
     const write = db.transaction(() => {
       const entityIdByName = new Map<string, string>();
+      const entityTypeByName = new Map<string, EntityType>();
       for (const draft of result.entities) {
         const row = resolveEntity(db, draft);
         if (!entityIdByName.has(draft.name)) stats.entities += 1;
         entityIdByName.set(draft.name, row.id);
+        entityTypeByName.set(draft.name, row.type as EntityType);
       }
-      for (const draft of result.facts) {
-        const subjectId = entityIdByName.get(draft.subject);
+      for (const rawDraft of result.facts) {
+        const subjectId = entityIdByName.get(rawDraft.subject);
         if (!subjectId) continue; // fact references an undeclared entity: drop the fact, keep the episode
-        const objectId = draft.object ? (entityIdByName.get(draft.object) ?? null) : null;
-        if (draft.object && !objectId) continue;
+        const objectId = rawDraft.object ? (entityIdByName.get(rawDraft.object) ?? null) : null;
+        if (rawDraft.object && !objectId) continue;
+        // Schema validation at write time: a relation whose subject/object types fall
+        // outside its declared domain/range is kept (the statement and quote are real)
+        // but coerced to RELATES_TO, so projections never see an impossible triple.
+        let draft = rawDraft;
+        const subjectType = entityTypeByName.get(rawDraft.subject)!;
+        const objectType = rawDraft.object ? (entityTypeByName.get(rawDraft.object) ?? null) : null;
+        if (!relationFits(rawDraft.predicate, subjectType, objectType)) {
+          draft = { ...rawDraft, predicate: "RELATES_TO" };
+          stats.coerced += 1;
+        }
         const resolved = resolveFact(db, draft, subjectId, objectId, episode.id);
         stats.facts[resolved.op as keyof typeof stats.facts] += 1;
       }

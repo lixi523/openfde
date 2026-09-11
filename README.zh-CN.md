@@ -1,3 +1,5 @@
+| `openfde ontology` | 本体即制品：每种类型的含义、实例数、孤儿实体、schema 违规；`--rdf` 导出 RDF/OWL（类、关系、个体、带出处的事实） |
+| `openfde path <a> <b>` | 连接两个实体的最短事实链，每一跳都有出处——CFO 和对账流程是怎么关联起来的 |
 # OpenFDE: AI workspace for FDEs
 
 [English](./README.md) | **简体中文** | [日本語](./README.ja.md) | [Español](./README.es.md)
