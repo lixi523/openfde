@@ -425,6 +425,25 @@ export function serve(options: ServeOptions): void {
           }
           return;
         }
+        case "/api/activity": {
+          // the audit strip under the kanban: latest task events across all tasks
+          // (the same rows `openfde task show <id>` prints per task)
+          const limit = Math.min(50, Number(url.searchParams.get("limit") ?? 12) || 12);
+          const db = openLedger(resolveEngagement(engagementParam));
+          try {
+            const events = db
+              .prepare(
+                `SELECT e.task_id, e.at, e.kind, e.from_status, e.to_status, e.note, e.actor, t.title
+                 FROM task_events e JOIN tasks t ON t.id = e.task_id
+                 ORDER BY e.at DESC LIMIT ?`,
+              )
+              .all(limit);
+            json(res, { events });
+          } finally {
+            db.close();
+          }
+          return;
+        }
         case "/api/task": {
           // mirrors `openfde task <transition>`: same state machine, same audit trail
           if (req.method !== "POST") return json(res, { error: "method not allowed" }, 405);

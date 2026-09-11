@@ -195,15 +195,13 @@ const FACT_SELECT = `
 function factBullet(f: FactRow, subjectPerspective: string | null): string {
   const struck = f.expired_at ? "~~" : "";
   const when = (f.valid_from ?? f.occurred_at ?? "").slice(0, 10);
-  const other =
-    subjectPerspective && f.subject === subjectPerspective
-      ? f.object
-        ? ` → [[${f.object}]]`
-        : ""
-      : ` ← [[${f.subject}]]`;
+  // the full triple reads the same on every page: subject —PREDICATE→ object
+  // (the webui turns the wiki-links into type-colored chips)
+  void subjectPerspective;
+  const triple = `[[${f.subject}]] \`${f.predicate}\`${f.object ? ` → [[${f.object}]]` : ""}`;
   const lines = [
     `- ${struck}${f.statement}${struck}${f.expired_at ? " `superseded`" : ""}`,
-    `  \`${f.predicate}\`${other}${when ? ` · ${when}` : ""}`,
+    `  ${triple}${when ? ` · ${when}` : ""}`,
   ];
   if (f.quote) lines.push(`  > ${f.quote.replace(/\n/g, " ")}`);
   lines.push(`  <small>${f.source_uri}${f.speaker ? ` · ${f.speaker}` : ""}</small>`);

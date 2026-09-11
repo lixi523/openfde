@@ -47,16 +47,16 @@ const NODE_CLASS: Record<string, string> = {
 
 /** classDef palette matching the webui light theme; GitHub renders it too */
 const CLASS_DEFS = [
-  "classDef goal fill:#faf3dc,stroke:#a16207,color:#26241f",
-  "classDef workflow fill:#eeebfa,stroke:#6d5bd0,color:#26241f",
-  "classDef step fill:#f5f4fc,stroke:#9186d8,color:#26241f",
-  "classDef system fill:#e9f0f7,stroke:#3b6ea5,color:#26241f",
-  "classDef datasource fill:#e6f2f1,stroke:#0f766e,color:#26241f",
-  "classDef constraint fill:#f9ebea,stroke:#b3423a,color:#26241f",
-  "classDef asset fill:#e9f3ec,stroke:#2e7d4f,color:#26241f",
-  "classDef pain fill:#f4ecf5,stroke:#96609a,color:#26241f",
-  "classDef decision fill:#f7edef,stroke:#b05a70,color:#26241f",
-  "classDef person fill:#f5f1e3,stroke:#8f7524,color:#26241f",
+  "classDef goal fill:#f8f1e2,stroke:#b7791f,color:#26251e",
+  "classDef workflow fill:#edf2e4,stroke:#4d7c0f,color:#26251e",
+  "classDef step fill:#f0f1f2,stroke:#6b7280,color:#26251e",
+  "classDef system fill:#e8edfb,stroke:#1d4ed8,color:#26251e",
+  "classDef datasource fill:#e7f1f0,stroke:#0f766e,color:#26251e",
+  "classDef constraint fill:#f9ece6,stroke:#c2410c,color:#26251e",
+  "classDef asset fill:#e8f2ea,stroke:#15803d,color:#26251e",
+  "classDef pain fill:#f2e9f9,stroke:#7e22ce,color:#26251e",
+  "classDef decision fill:#f8e8ef,stroke:#be185d,color:#26251e",
+  "classDef person fill:#f2f2e7,stroke:#7a7a12,color:#26251e",
 ];
 
 function flowFacts(db: Ledger): FlowFact[] {

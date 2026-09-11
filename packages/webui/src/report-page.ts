@@ -137,33 +137,35 @@ export function reportPage(report: ReportData, opts: ReportPageOptions = {}): st
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" />
 <title>Engagement report — ${esc(report.engagement)}</title>
 <style>
   :root {
-    --ink: #26241f; --muted: #6f6b61; --faint: #a29d90;
-    --line: #e3dfd3; --paper: #faf9f5; --card: #ffffff;
-    --accent: #c15f3c; --ok: #2e7d4f; --warn: #a16207;
+    --ink: #26251e; --muted: rgba(38,37,30,.55); --faint: rgba(38,37,30,.35);
+    --line: rgba(38,37,30,.12); --paper: #f7f7f4; --card: #ffffff;
+    --accent: #e0561c; --ok: #15803d; --warn: #b7791f;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    font-family: "Geist", system-ui, "Helvetica Neue", Helvetica, Arial,
       "Hiragino Sans", "Noto Sans CJK SC", sans-serif;
     background: var(--paper); color: var(--ink);
-    line-height: 1.6; font-size: 15px;
+    line-height: 1.6; font-size: 15px; -webkit-font-smoothing: antialiased;
   }
   main { max-width: 860px; margin: 0 auto; padding: 56px 40px 80px; }
   header.rpt { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 8px; }
-  header.rpt h1 { font-family: Georgia, "Times New Roman", serif; font-size: 30px; font-weight: 600; letter-spacing: -0.01em; }
+  header.rpt h1 { font-size: 30px; font-weight: 400; letter-spacing: -0.0125em; line-height: 1.25; }
   header.rpt .sub { color: var(--muted); margin-top: 6px; }
   .stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 22px 0 8px; }
-  .stat .num { font-size: 26px; font-weight: 700; }
+  .stat .num { font-size: 26px; font-weight: 500; font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
   .stat .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
   section { margin-top: 40px; }
   section > h2 {
     font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
     color: var(--accent); margin-bottom: 4px;
   }
-  section > .q { font-size: 21px; font-weight: 700; margin-bottom: 16px; }
+  section > .q { font-size: 21px; font-weight: 500; margin-bottom: 16px; }
   .card {
     background: var(--card); border: 1px solid var(--line); border-radius: 10px;
     padding: 16px 18px; margin-bottom: 12px;
@@ -173,7 +175,7 @@ export function reportPage(report: ReportData, opts: ReportPageOptions = {}): st
   .card-head { display: flex; align-items: center; gap: 10px; }
   .card-head h3 { font-size: 16px; flex: 1; }
   .tag {
-    font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+    font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 999px;
     text-transform: uppercase; letter-spacing: 0.04em;
   }
   .tag.ok { color: var(--ok); background: rgba(31,122,77,0.1); }
@@ -205,11 +207,10 @@ export function reportPage(report: ReportData, opts: ReportPageOptions = {}): st
   }
   #print-btn {
     position: fixed; top: 18px; right: 18px;
-    background: var(--accent); color: white; border: none; border-radius: 8px;
-    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(193,95,60,0.28);
+    background: var(--ink); color: var(--paper); border: none; border-radius: 999px;
+    height: 34px; padding: 0 14px; font: inherit; font-size: 13px; cursor: pointer;
   }
-  .live { color: var(--faint); font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+  .live { color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: 0.04em; }
   .live .dot {
     display: inline-block; width: 8px; height: 8px; border-radius: 50%;
     background: var(--faint); margin-right: 5px; vertical-align: 1px;
