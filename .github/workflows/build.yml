@@ -1,0 +1,116 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  build-cli:
+    name: Build OpenFDE CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      - name: Package CLI + node runtime (portable)
+        run: |
+          cd apps/cli
+          mkdir -p artifacts/cli
+          cp -r dist artifacts/cli/
+          cp package.json artifacts/cli/
+          # Stage a self-contained launcher
+          cat > artifacts/cli/openfde <<'EOF'
+          #!/usr/bin/env bash
+          set -e
+          SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+          exec node "$SCRIPT_DIR/dist/index.js" "$@"
+          EOF
+          chmod +x artifacts/cli/openfde
+          tar -czf ../../dist/openfde-cli.tar.gz -C artifacts cli
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openfde-cli
+          path: dist/openfde-cli.tar.gz
+
+  build-tray:
+    name: Build Windows Tray Launcher
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish self-contained tray app (framework-dependent, small)
+        run: |
+          cd apps/tray
+          dotnet publish -c Release --selfcontained false -r win-x64 `
+            -p:PublishSingleFile=true `
+            -p:InvariantGlobalization=true `
+            -p:StackTraceSupport=false `
+            -o ./publish
+          Rename-Item ./publish/OpenFDE.exe OpenFDE.Tray.exe -ErrorAction SilentlyContinue
+
+      - name: Publish self-contained tray app (full, no runtime needed)
+        run: |
+          cd apps/tray
+          dotnet publish -c Release --selfcontained true -r win-x64 `
+            -p:PublishSingleFile=true `
+            -p:InvariantGlobalization=true `
+            -p:StackTraceSupport=false `
+            -o ./publish-full
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openfde-tray-fw-depend
+          path: apps/tray/publish/OpenFDE.Tray.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openfde-tray-self-contained
+          path: apps/tray/publish-full/OpenFDE.exe
+
+  release:
+    name: Create GitHub Release
+    needs: [build-cli, build-tray]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Create Release from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/openfde-cli/openfde-cli.tar.gz
+            artifacts/openfde-tray-fw-depend/OpenFDE.Tray.exe
+            artifacts/openfde-tray-self-contained/OpenFDE.exe
+          fail_on_unmatched_files: false
+          generate_release_notes: true
