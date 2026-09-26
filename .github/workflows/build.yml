@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-cli:
-    name: Build OpenFDE CLI
+    name: Build OpenFDE CLI (Windows only)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,25 +29,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-      - name: Package CLI (tarball + launcher script)
+      - name: Package CLI as Windows .zip (with .cmd shim)
         run: |
           mkdir -p dist
-          cd apps/cli
-          mkdir -p artifacts/cli
-          cp -r dist artifacts/cli/
-          cp package.json artifacts/cli/
-          cat > artifacts/cli/openfde <<'EOF'
-          #!/usr/bin/env bash
-          set -e
-          SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-          exec node "$SCRIPT_DIR/dist/index.js" "$@"
-          EOF
-          chmod +x artifacts/cli/openfde
-          cd ../..
-          tar -czf dist/openfde-cli.tar.gz -C apps/cli artifacts/cli
-
-      - name: Package CLI (Windows .zip with cmd shim)
-        run: |
           cd apps/cli
           mkdir -p artifacts/cli-win
           cp -r dist artifacts/cli-win/
@@ -64,9 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: openfde-cli
-          path: |
-            dist/openfde-cli.tar.gz
-            dist/openfde-cli-win.zip
+          path: dist/openfde-cli-win.zip
 
   build-tray:
     name: Build Windows Tray Launcher
@@ -78,7 +60,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Publish framework-dependent (small, needs .NET 8 Desktop Runtime)
+      - name: Publish framework-dependent (164 KB, needs .NET 8 Desktop Runtime)
         run: |
           cd apps/tray
           dotnet publish -c Release --self-contained false -r win-x64 `
@@ -89,8 +71,11 @@ jobs:
           if (Test-Path ./publish/OpenFDE.exe) {
             Rename-Item ./publish/OpenFDE.exe OpenFDE.Tray.exe -Force
           }
+          if (Test-Path ./publish/OpenFDE.Tray.exe) {
+            Write-Output "Tray (fw-dependent): $((Get-Item ./publish/OpenFDE.Tray.exe).Length) bytes"
+          }
 
-      - name: Publish self-contained (no runtime needed)
+      - name: Publish self-contained (147 MB, no runtime needed)
         run: |
           cd apps/tray
           dotnet publish -c Release --self-contained true -r win-x64 `
@@ -129,7 +114,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            artifacts/openfde-cli/openfde-cli.tar.gz
             artifacts/openfde-cli/openfde-cli-win.zip
             artifacts/openfde-tray-fw-depend/OpenFDE.Tray.exe
             artifacts/openfde-tray-self-contained/OpenFDE.exe
