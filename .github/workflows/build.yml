@@ -21,10 +21,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Use npm instead of pnpm because pnpm 11's supply-chain check
-      # rejects native addons' (better-sqlite3, esbuild) build scripts.
-      - run: npm install
-      - run: npm run build
+      # Install pnpm and globally allow native-module build scripts.
+      # pnpm 11 supply-chain check rejects better-sqlite3/esbuild prebuilds
+      # unless we opt in via the global ~/.npmrc.
+      - run: npm install -g pnpm@11
+      - run: echo "dangerously-allow-all-build-scripts=true" >> ~/.npmrc
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
 
       - name: Package CLI as Windows .zip (with .cmd shim)
         run: |
