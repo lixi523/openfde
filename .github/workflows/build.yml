@@ -26,8 +26,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
-      # pnpm 11 supply-chain check: allow native-module build scripts (project-level config)
-      - run: pnpm install --frozen-lockfile --config.enable-pre-and-post-scripts-explicitly=false
+      # pnpm 11 supply-chain check: allow native-module build scripts
+      - run: pnpm install --frozen-lockfile --config.dangerously-allow-all-build-scripts=true
       - run: pnpm build
 
       - name: Package CLI as Windows .zip (with .cmd shim)
