@@ -29,13 +29,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-      - name: Package CLI + node runtime (portable)
+      - name: Package CLI (tarball + launcher script)
         run: |
+          mkdir -p dist
           cd apps/cli
           mkdir -p artifacts/cli
           cp -r dist artifacts/cli/
           cp package.json artifacts/cli/
-          # Stage a self-contained launcher
           cat > artifacts/cli/openfde <<'EOF'
           #!/usr/bin/env bash
           set -e
@@ -43,12 +43,30 @@ jobs:
           exec node "$SCRIPT_DIR/dist/index.js" "$@"
           EOF
           chmod +x artifacts/cli/openfde
-          tar -czf ../../dist/openfde-cli.tar.gz -C artifacts cli
+          cd ../..
+          tar -czf dist/openfde-cli.tar.gz -C apps/cli artifacts/cli
+
+      - name: Package CLI (Windows .zip with cmd shim)
+        run: |
+          cd apps/cli
+          mkdir -p artifacts/cli-win
+          cp -r dist artifacts/cli-win/
+          cp package.json artifacts/cli-win/
+          cat > artifacts/cli-win/openfde.cmd <<'EOF'
+          @echo off
+          setlocal
+          set "SCRIPT_DIR=%~dp0"
+          node "%SCRIPT_DIR%dist\index.js" %*
+          EOF
+          cd ../..
+          cd apps/cli/artifacts/cli-win && zip -r ../../../dist/openfde-cli-win.zip . && cd ../../../..
 
       - uses: actions/upload-artifact@v4
         with:
           name: openfde-cli
-          path: dist/openfde-cli.tar.gz
+          path: |
+            dist/openfde-cli.tar.gz
+            dist/openfde-cli-win.zip
 
   build-tray:
     name: Build Windows Tray Launcher
@@ -60,20 +78,22 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Publish self-contained tray app (framework-dependent, small)
+      - name: Publish framework-dependent (small, needs .NET 8 Desktop Runtime)
         run: |
           cd apps/tray
-          dotnet publish -c Release --selfcontained false -r win-x64 `
+          dotnet publish -c Release --self-contained false -r win-x64 `
             -p:PublishSingleFile=true `
             -p:InvariantGlobalization=true `
             -p:StackTraceSupport=false `
             -o ./publish
-          Rename-Item ./publish/OpenFDE.exe OpenFDE.Tray.exe -ErrorAction SilentlyContinue
+          if (Test-Path ./publish/OpenFDE.exe) {
+            Rename-Item ./publish/OpenFDE.exe OpenFDE.Tray.exe -Force
+          }
 
-      - name: Publish self-contained tray app (full, no runtime needed)
+      - name: Publish self-contained (no runtime needed)
         run: |
           cd apps/tray
-          dotnet publish -c Release --selfcontained true -r win-x64 `
+          dotnet publish -c Release --self-contained true -r win-x64 `
             -p:PublishSingleFile=true `
             -p:InvariantGlobalization=true `
             -p:StackTraceSupport=false `
@@ -110,6 +130,7 @@ jobs:
           prerelease: false
           files: |
             artifacts/openfde-cli/openfde-cli.tar.gz
+            artifacts/openfde-cli/openfde-cli-win.zip
             artifacts/openfde-tray-fw-depend/OpenFDE.Tray.exe
             artifacts/openfde-tray-self-contained/OpenFDE.exe
           fail_on_unmatched_files: false
