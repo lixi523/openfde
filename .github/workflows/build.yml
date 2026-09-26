@@ -32,19 +32,18 @@ jobs:
 
       - name: Package CLI as Windows .zip (with .cmd shim)
         run: |
-          mkdir -p dist
           cd apps/cli
+          mkdir -p ../../dist
           mkdir -p artifacts/cli-win
           cp -r dist artifacts/cli-win/
           cp package.json artifacts/cli-win/
           cat > artifacts/cli-win/openfde.cmd <<'EOF'
           @echo off
-          setlocal
+          setlocal          
           set "SCRIPT_DIR=%~dp0"
           node "%SCRIPT_DIR%dist\index.js" %*
           EOF
-          cd ../..
-          cd apps/cli/artifacts/cli-win && zip -r ../../../dist/openfde-cli-win.zip . && cd ../../../..
+          (cd artifacts/cli-win && zip -r ../../dist/openfde-cli-win.zip .)
 
       - uses: actions/upload-artifact@v4
         with:
