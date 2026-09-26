@@ -465,6 +465,12 @@
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-thumb { background: #d6d2c6; border-radius: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
+
+#lang-switch{display:flex;background:var(--bg-hover);border-radius:999px;padding:3px;gap:2px;margin-top:4px;}
+#lang-switch button{all:unset;flex:1;text-align:center;font-size:11.5px;padding:4px 8px;border-radius:999px;cursor:pointer;color:var(--text-muted);transition:background .15s,color .15s;white-space:nowrap;}
+#lang-switch button.active{background:var(--text);color:var(--bg);}
+#lang-switch button:hover:not(.active){color:var(--text);}
+.kb-head span:not(.dot):not(.n){overflow-wrap:anywhere;hyphens:none;}
 </style>
 </head>
 <body>
@@ -476,7 +482,7 @@
   </div>
 
   <div>
-    <label class="small" for="engagement">Engagement</label>
+    <label class="small" for="engagement" data-i18n="engagement">Engagement</label>
     <select id="engagement"></select>
   </div>
 
@@ -485,57 +491,61 @@
   </div>
   <div id="results"></div>
 
+  <div id="lang-switch">
+    <button data-lang="en">EN</button>
+    <button data-lang="zh-CN">中文</button>
+  </div>
   <div id="views">
-    <button id="view-notes" class="active">Note</button>
-    <button id="view-graph">Ontology</button>
-    <button id="view-todo">Todo</button>
-    <button id="view-canvas">Canvas</button>
+    <button id="view-notes" class="active" data-i18n="Note">Note</button>
+    <button id="view-graph" data-i18n="Ontology">Ontology</button>
+    <button id="view-todo" data-i18n="Todo">Todo</button>
+    <button id="view-canvas" data-i18n="Canvas">Canvas</button>
   </div>
 
-  <a id="report-link" class="pill dark" href="/report" target="_blank">Executive report ↗</a>
+  <a id="report-link" class="pill dark" href="/report" target="_blank" data-i18n="Executive report ↗">Executive report ↗</a>
 
   <div id="tree"></div>
 
   <div id="graph-controls">
     <div id="stats"></div>
     <div>
-      <label class="small">Entity types</label>
+      <label class="small" data-i18n="Entity types">Entity types</label>
       <div id="legend"></div>
     </div>
-    <a id="schema-link" class="mini" href="#" onclick="openView('ontology'); return false;">Schema &amp; health →</a>
+    <a id="schema-link" class="mini" href="#" onclick="openView('ontology'); return false;" data-i18n="Schema & health →">Schema &amp; health →</a>
     <label class="toggle-row">
       <input type="checkbox" id="show-expired" />
-      <span>Show superseded facts</span>
+      <span data-i18n="Show superseded facts">Show superseded facts</span>
     </label>
   </div>
 
   <div id="side-hint"></div>
 
   <footer>
-    Feed it from the terminal:<br />
+    <span data-i18n="Feed it from the terminal:">Feed it from the terminal:</span><br />
     <code>openfde ingest notes.md</code>
     <code>openfde extract</code>
   </footer>
 </aside>
 
 <main id="main">
-  <div id="save-state">Saved</div>
+  <div id="save-state" data-i18n="Saved">Saved</div>
   <div id="note-view">
     <article id="note"></article>
     <div id="note-placeholder">
-      <div class="big">Pick a note from the tree</div>
-      <div>Entities and episodes render as markdown notes.<br />Nothing here yet? Ingest and extract:</div>
+      <div class="big" data-i18n="Pick a note from the tree">Pick a note from the tree</div>
+      <div> <span data-i18n="Entities and episodes render as markdown notes.<br />Nothing here yet? Ingest and extract:">Entities and episodes render as markdown notes.<br />Nothing here yet? Ingest and extract:</span></div>
       <code>openfde ingest interview.md && openfde extract</code>
     </div>
   </div>
   <div id="stage">
     <canvas id="graph"></canvas>
-    <div id="hud">drag to pan · scroll to zoom · click a node to open its note</div>
+    <div id="hud" data-i18n="drag to pan · scroll to zoom · click a node to open its note">drag to pan · scroll to zoom · click a node to open its note</div>
   </div>
   <div id="board"><div id="board-cols"></div><div id="audit"></div></div>
   <div id="canvas-wrap">
     <div id="canvas-surface"></div>
-    <div id="canvas-hint">double-click anywhere to add a card · drag by the top bar · click text to edit</div>
+    <div id="canvas-hint" data-i18n="double-click anywhere to add a card · drag by the top bar · click text to edit">double-click anywhere to add a card · drag by the top bar · click text to edit</div>
   </div>
 </main>
 
@@ -543,6 +553,87 @@
 
 <script>
 "use strict";
+
+const I18N={
+  en:{},
+  "zh-CN":{     "engagement": "项目",
+    "Search memory…": "搜索记忆…",
+    "Note": "笔记",
+    "Ontology": "本体",
+    "Todo": "任务",
+    "Canvas": "画布",
+    "Executive report ↗": "高管报告 ↗",
+    "Entity types": "实体类型",
+    "Schema & health →": "Schema 与健康检查 →",
+    "Show superseded facts": "展示已失效的事实",
+    "Views": "视图",
+    "Pages": "页面",
+    "Projections": "投影视图",
+    "Documents": "文档",
+    "FDE.md": "FDE.md",
+    "Flows": "业务流程",
+    "Ontology schema": "本体 Schema",
+    "Interview · top-down": "访谈·自上而下",
+    "Interview · bottom-up": "访谈·自下而上",
+    "Data map": "数据地图",
+    "Asset library": "资产库",
+    "+ New page": "+ 新建页面",
+    "Feed it from the terminal:": "在终端导入数据：",
+    "Saved": "已保存",
+    "Saving…": "保存中…",
+    "Save failed": "保存失败",
+    "Pick a note from the tree": "从左侧目录树选择一条笔记",
+    "Entities and episodes render as markdown notes.<br />Nothing here yet? Ingest and extract:": "实体和事件片段将渲染为 Markdown 笔记。<br />还没内容？先摄取并抽取：",
+    "drag to pan · scroll to zoom · click a node to open its note": "拖动以平移·滚轮缩放·点击节点打开其笔记",
+    "double-click anywhere to add a card · drag by the top bar · click text to edit": "双击任意空白处添加卡片·拖动顶部把手移动·单击文字编辑",
+    "Delete card": "删除卡片",
+    "Untitled": "未命名",
+    "Click to add a block — type / for options": "点击添加新块——输入 / 查看选项",
+    "Delete this page": "删除本页",
+    "Delete page?": "删除页面？",
+    "Delete block": "删除块",
+    "Move up": "上移",
+    "Move down": "下移",
+    "entities": "实体",
+    "active facts": "生效事实",
+    "episodes": "事件片段",
+    "superseded": "已失效",
+    "open tasks": "进行中任务",
+    "no LLM": "无 LLM",
+    "n facts": "条事实",
+    "in ms": "毫秒",
+    "draft": "草稿",
+    "ready": "就绪",
+    "claimed": "已认领",
+    "running": "执行中",
+    "review": "待评审",
+    "accepted": "已验收",
+    "rejected": "已拒绝",
+    "no task events yet": "暂无任务事件",
+    "Text": "文本",
+    "Heading 1": "标题 1",
+    "Heading 2": "标题 2",
+    "Heading 3": "标题 3",
+    "Bulleted list": "无序列表",
+    "Quote": "引用",
+    "Code": "代码块",
+    "Mermaid diagram": "Mermaid 图表",
+    "Divider": "分割线",
+    "New page": "新页面",
+    "kanban-hint-main": "卡片对应的就是 Agent 处理的任务清单。拖拽卡片即可改变任务状态——非法的状态迁移会被状态机拒绝。",
+    "canvas-hint-main": "一个供结构化思考之前自由挥洒的表面。双击即可添加 Markdown 卡片；所有内容持久化到 engagement 目录。", },
+};
+state.lang=localStorage.getItem("openfde-lang")||"en";
+function t(k){const T=I18N[state.lang]||I18N.en;return T[k]??k;}
+function applyLang(){
+  document.documentElement.lang=state.lang==="zh-CN"?"zh-CN":"en";
+  const s=document.getElementById("lang-switch");
+  if(s)for(const b of s.querySelectorAll("button"))b.classList.toggle("active",b.dataset.lang===state.lang);
+  const ph=document.getElementById("search");if(ph)ph.placeholder=t("Search memory…");
+  document.title=state.lang==="zh-CN"?"OpenFDE — 项目记忆":"OpenFDE — engagement memory";
+  for(const el of document.querySelectorAll("[data-i18n]"))el.innerHTML=t(el.getAttribute("data-i18n"));
+}
+
 
 /* ---------------- palette ---------------- */
 /* one palette with the landing page: --t-* type colors */
@@ -656,9 +747,9 @@ async function refresh() {
 const TABS = { notes: "view-notes", graph: "view-graph", todo: "view-todo", canvas: "view-canvas" };
 
 const SIDE_HINTS = {
-  todo: `<div class="hint-block">Cards are the same task ledger agents work from. Drag a card to change its state — illegal transitions are rejected by the state machine.</div>
+  todo: () => `<div class="hint-block">${t("kanban-hint-main")}</div>
     <div class="hint-block"><code>openfde task create &lt;title&gt;</code><br /><code>openfde task list --json</code><br /><code>openfde context &lt;id&gt;</code></div>`,
-  canvas: `<div class="hint-block">A free surface for the thinking that precedes structure. Double-click to add a markdown card; everything persists to the engagement directory.</div>
+  canvas: () => `<div class="hint-block">${t("canvas-hint-main")}</div>
     <div class="hint-block"><code>openfde canvas show</code><br /><code>openfde canvas add &lt;text&gt;</code></div>`,
 };
 
@@ -675,7 +766,7 @@ function setView(view) {
   document.getElementById("graph-controls").style.display = view === "graph" ? "flex" : "none";
   const hint = document.getElementById("side-hint");
   hint.style.display = view === "todo" || view === "canvas" ? "flex" : "none";
-  if (SIDE_HINTS[view]) hint.innerHTML = SIDE_HINTS[view];
+  if (SIDE_HINTS[view]) hint.innerHTML = SIDE_HINTS[view]();
   if (view === "graph") { resizeCanvas(); maybeFit(); }
   if (view === "todo" && state.engagement) renderBoard();
   if (view === "canvas" && state.engagement) renderCanvas();
@@ -722,7 +813,7 @@ async function renderBoard() {
     col.className = "kb-col";
     col.innerHTML =
       `<div class="kb-head"><span class="dot" style="background:${STATUS_COLORS[status]}"></span>` +
-      `<span>${status}</span><span class="n">${tasks.length}</span></div>`;
+      `<span>${t(status)}</span><span class="n">${tasks.length}</span></div>`;
     const cards = document.createElement("div");
     cards.className = "kb-cards";
     if (tasks.length === 0) cards.innerHTML = `<div class="kb-empty">—</div>`;
@@ -787,7 +878,7 @@ function renderAudit(events) {
   const el = document.getElementById("audit");
   el.innerHTML = "";
   if (!events || events.length === 0) {
-    el.innerHTML = `<div><span class="id">no task events yet</span></div>`;
+    el.innerHTML = `<div><span class="id">${t("no task events yet")}</span></div>`;
     return;
   }
   for (const ev of events.slice(0, 6)) {
@@ -836,7 +927,7 @@ function cvCardEl(card) {
   grip.className = "cv-grip";
   const del = document.createElement("button");
   del.textContent = "✕";
-  del.title = "Delete card";
+  del.title = t("Delete card");
   del.onclick = (e) => {
     e.stopPropagation();
     cv.cards = cv.cards.filter((c) => c.id !== card.id);
@@ -909,9 +1000,9 @@ function saveCanvasSoon() {
         body: JSON.stringify({ cards: cv.cards }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
-      toast("Saved");
+      toast(t("Saved"));
     } catch (error) {
-      toast("Save failed");
+      toast(t("Save failed"));
       console.error(error);
     }
   }, 400);
@@ -934,17 +1025,17 @@ document.getElementById("canvas-surface").ondblclick = (e) => {
 
 /* ---------------- tree ---------------- */
 const VIEWS_SECTION = {
-  label: "Views",
+  label: t("Views"),
   groups: [{
-    label: "Projections",
+    label: t("Projections"),
     items: [
-      { id: "view:fde", label: "FDE.md" },
-      { id: "view:flows", label: "Flows" },
-      { id: "view:ontology", label: "Ontology schema" },
-      { id: "view:interview-top", label: "Interview · top-down" },
-      { id: "view:interview-bottom", label: "Interview · bottom-up" },
-      { id: "view:datamap", label: "Data map" },
-      { id: "view:assets", label: "Asset library" },
+      { id: "view:fde", label: t("FDE.md") },
+      { id: "view:flows", label: t("Flows") },
+      { id: "view:ontology", label: t("Ontology schema") },
+      { id: "view:interview-top", label: t("Interview · top-down") },
+      { id: "view:interview-bottom", label: t("Interview · bottom-up") },
+      { id: "view:datamap", label: t("Data map") },
+      { id: "view:assets", label: t("Asset library") },
     ],
   }],
 };
@@ -955,10 +1046,10 @@ function renderTree(tree) {
   const pagesSection = {
     label: "Pages",
     groups: [{
-      label: "Documents",
+      label: t("Documents"),
       items: [
         ...state.pages.map((p) => ({ id: `page:${p.slug}`, label: p.title })),
-        { id: "page:+new", label: "+ New page" },
+        { id: "page:+new", label: t("+ New page") },
       ],
     }],
   };
@@ -1133,7 +1224,7 @@ function splitBlocks(md) {
 let saveTimer = null;
 function scheduleSave() {
   const el = document.getElementById("save-state");
-  el.textContent = "Saving…";
+  el.textContent = t("Saving…");
   el.classList.add("visible");
   clearTimeout(saveTimer);
   saveTimer = setTimeout(savePage, 600);
@@ -1153,7 +1244,7 @@ async function savePage() {
       body: JSON.stringify({ markdown }),
     });
     if (!res.ok) throw new Error((await res.json()).error);
-    el.textContent = "Saved";
+    el.textContent = t("Saved");
     setTimeout(() => el.classList.remove("visible"), 1200);
     const pages = await api("/api/pages");
     state.pages = pages.pages;
@@ -1161,7 +1252,7 @@ async function savePage() {
     const ref = state.pages.find((p) => p.slug === state.page.slug);
     if (item && ref) item.textContent = ref.title;
   } catch (error) {
-    el.textContent = "Save failed";
+    el.textContent = t("Save failed");
     console.error(error);
   }
 }
@@ -1184,7 +1275,7 @@ async function openPage(slug, opts = {}) {
 }
 
 async function newPage() {
-  const base = "Untitled";
+  const base = t("Untitled");
   let title = base;
   for (let n = 2; state.pages.some((p) => p.title === title || p.slug === title.toLowerCase()); n++) {
     title = `${base} ${n}`;
@@ -1210,7 +1301,7 @@ async function newPage() {
 
 async function removePage() {
   if (!state.page) return;
-  if (!confirm(`Delete page "${state.page.slug}"?`)) return;
+  if (!confirm(`${t("Delete page?")} "${state.page.slug}"?`)) return;
   const url = new URL("/api/page", location.origin);
   url.searchParams.set("engagement", state.engagement);
   url.searchParams.set("slug", state.page.slug);
@@ -1229,7 +1320,7 @@ function renderPage() {
   });
   const add = document.createElement("div");
   add.className = "block block-new";
-  add.textContent = "Click to add a block — type / for options";
+  add.textContent = t("Click to add a block — type / for options");
   add.onclick = () => {
     state.page.blocks.push("");
     renderPage();
@@ -1237,7 +1328,7 @@ function renderPage() {
   };
   note.appendChild(add);
   const del = document.createElement("p");
-  del.innerHTML = `<small style="cursor:pointer" id="delete-page">Delete this page</small>`;
+  del.innerHTML = `<small style="cursor:pointer" id="delete-page">${t("Delete this page")}</small>`;
   del.style.marginTop = "48px";
   note.appendChild(del);
   document.getElementById("delete-page").onclick = removePage;
@@ -1253,7 +1344,7 @@ function blockEl(block, i) {
   for (const [glyph, act] of [["↑", "up"], ["↓", "down"], ["✕", "del"]]) {
     const b = document.createElement("button");
     b.textContent = glyph;
-    b.title = act === "del" ? "Delete block" : act === "up" ? "Move up" : "Move down";
+    b.title = act === "del" ? t("Delete block") : act === "up" ? t("Move up") : t("Move down");
     b.onclick = (e) => {
       e.stopPropagation();
       const blocks = state.page.blocks;
@@ -1345,16 +1436,16 @@ function blockKeydown(e, ta, i) {
 
 /* ---------------- slash menu ---------------- */
 const SLASH_ITEMS = [
-  { label: "Text", k: "", insert: "" },
-  { label: "Heading 1", k: "#", insert: "# " },
-  { label: "Heading 2", k: "##", insert: "## " },
-  { label: "Heading 3", k: "###", insert: "### " },
-  { label: "Bulleted list", k: "-", insert: "- " },
-  { label: "Quote", k: ">", insert: "> " },
-  { label: "Code", k: "```", insert: "```\n\n```" },
-  { label: "Mermaid diagram", k: "```mermaid", insert: '```mermaid\nflowchart LR\n  a["Start"] --> b["Done"]\n```' },
-  { label: "Divider", k: "---", insert: "---", commit: true },
-  { label: "New page", k: "+", action: "newpage" },
+  { label: t("Text"), k: "", insert: "" },
+  { label: t("Heading 1"), k: "#", insert: "# " },
+  { label: t("Heading 2"), k: "##", insert: "## " },
+  { label: t("Heading 3"), k: "###", insert: "### " },
+  { label: t("Bulleted list"), k: "-", insert: "- " },
+  { label: t("Quote"), k: ">", insert: "> " },
+  { label: t("Code"), k: "```", insert: "```\n\n```" },
+  { label: t("Mermaid diagram"), k: "```mermaid", insert: '```mermaid\nflowchart LR\n  a["Start"] --> b["Done"]\n```' },
+  { label: t("Divider"), k: "---", insert: "---", commit: true },
+  { label: t("New page"), k: "+", action: "newpage" },
 ];
 
 const slash = { active: false, ta: null, blockIndex: -1, sel: 0, items: [] };
@@ -1708,7 +1799,7 @@ function renderStats(s) {
   for (const [num, lbl] of items) {
     const div = document.createElement("div");
     div.className = "stat";
-    div.innerHTML = `<div class="num">${num}</div><div class="lbl">${lbl}</div>`;
+    div.innerHTML = `<div class="num">${num}</div><div class="lbl">${t(lbl)}</div>`;
     el.appendChild(div);
   }
 }
@@ -1761,7 +1852,7 @@ document.getElementById("search").oninput = (e) => {
     resultsEl.innerHTML = "";
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = `${data.hits.length} facts · ${ms} ms · no LLM`;
+    meta.textContent = `${data.hits.length} ${t("n facts")} · ${ms} ${t("in ms")} · ${t("no LLM")}`;
     resultsEl.appendChild(meta);
     const terms = q.split(/\s+/).filter((w) => w.length > 1);
     const highlight = (text) => {
@@ -2084,10 +2175,25 @@ canvas.addEventListener("wheel", (e) => {
 canvas.addEventListener("dblclick", () => { state.tx = 0; state.ty = 0; state.scale = 1; });
 
 /* ---------------- boot ---------------- */
+
+(()=>{
+  const sw=document.getElementById("lang-switch");
+  if(!sw) return;
+  sw.querySelectorAll("button").forEach((b)=>{
+    b.addEventListener("click",()=>{
+      if(b.dataset.lang!=="en"&&b.dataset.lang!=="zh-CN")return;
+      state.lang=b.dataset.lang;
+      localStorage.setItem("openfde-lang",state.lang);
+      applyLang(); refresh();
+    });
+  });
+})();
+
 (async function boot() {
   resizeCanvas();
   const hashView = { "#graph": "graph", "#ontology": "graph", "#todo": "todo", "#canvas": "canvas" }[location.hash];
   setView(hashView ?? "notes");
+  applyLang();
   await loadEngagements();
   if (state.engagement) await refresh();
   if (state.engagement && location.hash.startsWith("#note=")) {

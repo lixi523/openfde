@@ -6,6 +6,14 @@ node_modules/
 dist/
 .turbo/
 
+# C# build artifacts
+apps/tray/bin/
+apps/tray/obj/
+apps/tray/publish/
+*.user
+*.suo
+.vs/
+
 # env & secrets
 .env
 .env.*
