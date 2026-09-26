@@ -21,13 +21,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # pnpm 10+ introduced strict supply-chain build-script checking that
+      # requires an explicit allowlist (only-built-packages). pnpm 9 tolerates
+      # the same scenario with just a warning — use 9 to keep CI simple.
       - uses: pnpm/action-setup@v4
         with:
-          version: 11
-      # pnpm 11 requires explicit opt-in for native-module build scripts
-      # (better-sqlite3, esbuild). Appending to global ~/.npmrc is the
-      # documented approach after pnpm/action-setup initializes PNPM_HOME.
-      - run: echo "dangerouslyAllowAllBuildScripts=true" >> ~/.npmrc
+          version: 9
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
