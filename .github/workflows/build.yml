@@ -24,9 +24,10 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 11
-      # pnpm 11 supply-chain check rejects native addons' build scripts.
-      # Opt in via the global ~/.npmrc that pnpm/action-setup creates.
-      - run: echo "dangerously-allow-all-build-scripts=true" >> ~/.npmrc
+      # pnpm 11 requires explicit opt-in for native-module build scripts
+      # (better-sqlite3, esbuild). Appending to global ~/.npmrc is the
+      # documented approach after pnpm/action-setup initializes PNPM_HOME.
+      - run: echo "dangerouslyAllowAllBuildScripts=true" >> ~/.npmrc
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
